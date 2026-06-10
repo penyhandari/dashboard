@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
+import os
 
 # ==========================================
 # 1. KONFIGURASI HALAMAN & THEME
@@ -85,18 +86,31 @@ st.markdown("""
 # ==========================================
 @st.cache_data
 def load_cleaned_data():
-    try:
-        # Membaca data yang sudah dibersihkan oleh user sebelumnya
-        df = pd.read_csv('India_Air_Quality_Cleaned.xlsx - Cleaned Data.csv')
-    except Exception:
-        # Fallback dataset jika file tidak ditemukan saat deployment pertama
-        # Membuat data sintetis yang sangat mendekati karakteristik data asli
+    # Daftar prioritas file yang akan dimuat
+    possible_files = [
+        'India_Air_Quality_Cleaned.xlsx - Cleaned Data.csv',
+        'India Air Quality Analysis.csv'
+    ]
+    
+    df = None
+    for file in possible_files:
+        if os.path.exists(file):
+            try:
+                # Menggunakan delimiter ';' jika mendeteksi file mentah asli
+                delim = ';' if 'Analysis' in file else ','
+                df = pd.read_csv(file, delimiter=delim, na_values=["NA", "na", "Null", " ", "NA\r"])
+                break
+            except Exception:
+                continue
+                
+    # Jika tidak ada file fisik, buat data simulasi representatif agar dashboard tetap menyala
+    if df is None:
         dates = pd.date_range(start="2015-01-01", end="2015-12-31", freq="D")
         locations = ['Hyderabad', 'Chittoor', 'Guntur', 'Kurnool', 'Vijayawada', 'Visakhapatnam']
         types = ['Residential, Rural and other Areas', 'Industrial Area', 'Sensitive Area']
         
         np.random.seed(42)
-        n_rows = 1500
+        n_rows = 2000
         
         df = pd.DataFrame({
             'stn_code': np.random.choice([150, 151, 152], n_rows),
@@ -110,13 +124,43 @@ def load_cleaned_data():
             'pm2_5': [36.0] * n_rows,
             'date': np.random.choice(dates, n_rows)
         })
-        df['date'] = pd.to_datetime(df['date'])
+
+    # Standardisasi nama kolom (mengubah menjadi lowercase dan strip spasi)
+    df.columns = df.columns.str.strip().str.lower()
     
-    # Pastikan tipe data tanggal dan sorting
-    df['date'] = pd.to_datetime(df['date'])
+    # Standardisasi format tanggal dan waktu
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    else:
+        df['date'] = pd.to_datetime(df['sampling_date'], errors='coerce')
+        
+    # Isi tanggal kosong jika ada kegagalan parsing
+    df['date'] = df['date'].fillna(pd.Timestamp('2015-01-01'))
     df['year'] = df['date'].dt.year
     df['month'] = df['date'].dt.strftime('%B')
     df['month_num'] = df['date'].dt.month
+    
+    # Konversi kolom numerik yang kritis
+    numeric_cols = ['so2', 'no2', 'rspm', 'spm']
+    for col in numeric_cols:
+        if col in df.columns:
+            # Hilangkan karakter non-numerik jika ada typo input
+            df[col] = df[col].astype(str).str.replace(r'[^\d\.]', '', regex=True)
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+            # Imputasi jika masih ada NaN sisa menggunakan nilai median
+            df[col] = df[col].fillna(df[col].median())
+        else:
+            # Buat kolom dengan median default jika kolom tidak ada sama sekali
+            df[col] = 40.0
+            
+    # Pastikan kolom kategorikal bersih dari NA/kosong
+    categorical_cols = ['state', 'location', 'type']
+    for col in categorical_cols:
+        if col in df.columns:
+            df[col] = df[col].fillna("Unknown").astype(str).str.strip()
+        else:
+            df[col] = "Unknown"
+            
     return df
 
 df = load_cleaned_data()
@@ -317,14 +361,34 @@ with col_table:
     city_leaderboard = filtered_by_state.groupby('location')[['rspm', 'no2', 'so2']].mean().round(1).reset_index()
     city_leaderboard = city_leaderboard.sort_values('rspm', ascending=True) # Dari paling bersih
     
-    # Beri warna/penanda estetis untuk pembacaan tabel yang intuitif
-    def highlight_rspm(val):
-        if val < 60: return 'background-color: #DCFCE7; color: #15803D;'
-        elif val < 100: return 'background-color: #FEF3C7; color: #B45309;'
-        else: return 'background-color: #FEE2E2; color: #991B1B;'
-
-    styled_leaderboard = city_leaderboard.style.applymap(highlight_rspm, subset=['rspm'])
-    st.dataframe(styled_leaderboard, use_container_width=True, hide_index=True)
+    # Gunakan st.column_config untuk format visual yang responsif dan aman tanpa error applymap
+    st.dataframe(
+        city_leaderboard,
+        column_config={
+            "location": st.column_config.TextColumn(
+                "Nama Kota / Lokasi",
+                help="Kota stasiun pengamatan resmi",
+                width="medium"
+            ),
+            "rspm": st.column_config.NumberColumn(
+                "Debu Halus (RSPM)",
+                help="Batas aman standar: < 60",
+                format="%.1f µg/m³"
+            ),
+            "no2": st.column_config.NumberColumn(
+                "Gas Kendaraan (NO2)",
+                help="Batas aman standar: < 40",
+                format="%.1f µg/m³"
+            ),
+            "so2": st.column_config.NumberColumn(
+                "Zat Asam Industri (SO2)",
+                help="Batas aman standar: < 80",
+                format="%.1f µg/m³"
+            )
+        },
+        hide_index=True,
+        use_container_width=True
+    )
 
 with col_edu:
     st.markdown("""
