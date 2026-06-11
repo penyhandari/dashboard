@@ -148,20 +148,42 @@ with tab2:
     
         st.plotly_chart(fig_season, use_container_width=True)
         
-    with col_right:
-        st.subheader("🧪 Distribusi Parameter Kritis")
-        st.markdown("*Parameter polutan yang bertanggung jawab memicu pemburukan kualitas udara.*")
+   with col_right:
+        st.subheader("🧪 Distribusi Parameter Kritis per Tahun")
+        st.markdown("*Persentase parameter polutan yang bertanggung jawab memicu pemburukan kualitas udara setiap tahunnya.*")
         
-        df_crit = df_filtered[df_filtered['critical'].notna()]
-        df_crit_count = df_crit.groupby(['critical', 'categori']).size().reset_index(name='jumlah_kemunculan')
+        # 1. Pastikan data tidak kosong dan buat salinan data
+        df_crit = df_filtered[df_filtered['critical'].notna()].copy()
         
-        fig_crit = px.bar(df_crit_count, x='critical', y='jumlah_kemunculan', color='categori',
-                          title="Frekuensi Parameter Kritis Berdasarkan Kategori",
-                          labels={'jumlah_kemunculan': 'Jumlah Hari', 'critical': 'Jenis Polutan'},
-                          color_discrete_map=ispu_colors)
+        # 2. Ambil komponen tahun dari kolom tanggal (asumsi nama kolom adalah 'tanggal')
+        # Jika Anda sudah punya kolom 'tahun', baris di bawah ini bisa dihapus/dikomentari
+        if 'tahun' not in df_crit.columns:
+            df_crit['tahun'] = pd.to_datetime(df_crit['tanggal']).dt.year
         
-        # Tambahkan baris ini untuk mengunci rentang sumbu Y dari 0 sampai 1000
-        fig_crit.update_yaxes(range=[0, 150])
+        # 3. Hitung frekuensi kemunculan polutan per tahun
+        df_crit_count = df_crit.groupby(['tahun', 'critical']).size().reset_index(name='jumlah_kemunculan')
+        
+        # 4. Hitung total kemunculan per tahun untuk mencari persentase
+        df_crit_count['total_tahunan'] = df_crit_count.groupby('tahun')['jumlah_kemunculan'].transform('sum')
+        df_crit_count['persentase'] = (df_crit_count['jumlah_kemunculan'] / df_crit_count['total_tahunan']) * 100
+        
+        # 5. Buat Stacked Bar Chart (Sumbu X = Tahun, Sumbu Y = Persentase, Warna = Polutan)
+        fig_crit = px.bar(df_crit_count, 
+                          x='tahun', 
+                          y='persentase', 
+                          color='critical',
+                          title="Tren Kontribusi Parameter Kritis Tahunan (%)",
+                          labels={'persentase': 'Persentase (%)', 'tahun': 'Tahun', 'critical': 'Parameter Kritis'},
+                          text=df_crit_count['persentase'].apply(lambda x: f'{x:.1f}%'), # Menampilkan teks % di dalam bar
+                          color_discrete_sequence=px.colors.qualitative.Safe) # Menggunakan palet warna kategori yang aman
+        
+        # 6. Mengatur tampilan grafik agar menjadi 100% Stacked Bar dan merapikan teks
+        fig_crit.update_layout(barmode='stack', yawaxis_ticksuffix="%")
+        fig_crit.update_traces(textposition='inside', texttemplate='%{text}')
+        
+        # 7. Mengunci rentang sumbu Y dari 0 sampai 100%
+        fig_crit.update_yaxes(range=[0, 100], title_text="Persentase Kontribusi")
+        fig_crit.update_xaxes(type='category', title_text="Tahun") # Memaksa tahun dibaca sebagai kategori (bukan angka kontinu)
         
         st.plotly_chart(fig_crit, use_container_width=True)
 
