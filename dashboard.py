@@ -159,6 +159,10 @@ with tab2:
                           title="Frekuensi Parameter Kritis Berdasarkan Kategori",
                           labels={'jumlah_kemunculan': 'Jumlah Hari', 'critical': 'Jenis Polutan'},
                           color_discrete_map=ispu_colors)
+        
+        # Tambahkan baris ini untuk mengunci rentang sumbu Y dari 0 sampai 1000
+        fig_crit.update_yaxes(range=[0, 1000])
+        
         st.plotly_chart(fig_crit, use_container_width=True)
 
 
