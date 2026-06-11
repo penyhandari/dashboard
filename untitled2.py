@@ -1,7 +1,7 @@
 # ==============================================================================
 # 0. PERINTAH INSTALASI (Hapus tanda '#' di bawah ini jika dijalankan di Google Colab)
 # ==============================================================================
-# !pip install streamlit matplotlib seaborn pandas
+!pip install streamlit matplotlib seaborn pandas
 
 import pandas as pd
 import matplotlib.pyplot as plt
