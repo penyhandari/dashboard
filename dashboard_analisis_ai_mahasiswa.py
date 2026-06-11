@@ -7,7 +7,7 @@ import os
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="Dashboard Dampak GenAI bagi Mahasiswa",
+    page_title="Dashboard Dampak GenAI Mahasiswa",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -76,7 +76,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     # Mencoba membaca file hasil cleaning terlebih dahulu, jika gagal membaca file asli
-    file_cleaned = "ai_student_impact_cleaned.xlsx"
+    file_cleaned = "ai_student_impact_cleaned.xlsx - Sheet1.csv"
     file_raw = "ai_student_impact_dataset.csv"
     
     if os.path.exists(file_cleaned):
