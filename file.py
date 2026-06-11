@@ -772,7 +772,7 @@ with col_e:
         textfont=dict(size=11, color="#F7F3EE"),
         colorbar=dict(
             title="GPA Δ",
-            titlefont=dict(size=11, color="#8FAFC8"),
+            tickfont=dict(size=11, color="#8FAFC8"),
             tickfont=dict(size=10, color="#8FAFC8"),
             len=0.7,
         ),
