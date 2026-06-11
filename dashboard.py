@@ -87,7 +87,7 @@ with st.sidebar:
     st.markdown("---")
     
     # Filter 1: Dropdown Pilih Stasiun SPKU (Menggunakan istilah kedinasan)
-    list_stasiun = sorted(list(df_orig['stasiun'].unique()))
+    list_stasiun = sorted(list(df_orig['stasiun'].unique))
     opsi_stasiun = ["Semua Stasiun"] + list_stasiun
     selected_stasiun = st.selectbox("Pilih Stasiun SPKU:", opsi_stasiun, index=0)
     
