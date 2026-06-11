@@ -155,21 +155,13 @@ with tab2:
         df_crit = df_filtered[df_filtered['critical'].notna()]
         df_crit_count = df_crit.groupby(['critical', 'categori']).size().reset_index(name='jumlah_kemunculan')
         
-        # Urutkan data berdasarkan jumlah kemunculan terbanyak agar sumbu X lebih rapi
-        df_crit_count = df_crit_count.sort_values(by='jumlah_kemunculan', ascending=False)
-        
         fig_crit = px.bar(df_crit_count, x='critical', y='jumlah_kemunculan', color='categori',
                           title="Frekuensi Parameter Kritis Berdasarkan Kategori",
-                          labels={'jumlah_kemunculan': 'Jumlah Hari', 'critical': 'Jenis Polutan (Parameter Kritis)'},
+                          labels={'jumlah_kemunculan': 'Jumlah Hari', 'critical': 'Jenis Polutan'},
                           color_discrete_map=ispu_colors)
         
-        # Kunci rentang sumbu Y (0-1000)
-        fig_crit.update_yaxes(range=[0, 1000])
-        
-        # --- PERBAIKAN SUMBU X ---
-        # type='category': Memastikan Plotly memperlakukan nama polutan sebagai teks/kategori discrete
-        # tickangle=0: Memastikan teks tetap tegak (bisa diganti -45 jika nama polutan terlalu panjang)
-        fig_crit.update_xaxes(type='category', tickangle=0, title_text="Parameter Kritis (Polutan)")
+        # Tambahkan baris ini untuk mengunci rentang sumbu Y dari 0 sampai 1000
+        fig_crit.update_yaxes(range=[0, 200])
         
         st.plotly_chart(fig_crit, use_container_width=True)
 
