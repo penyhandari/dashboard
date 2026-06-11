@@ -2,21 +2,27 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# 1. Load Dataset
-# Sesuaikan path file jika dijalankan di lingkungan lokal Anda
+# 1. Membaca Dataset
+# Pastikan file 'ai_student_impact_dataset (1).csv' berada di folder yang sama dengan skrip ini
 df = pd.read_csv('ai_student_impact_dataset (1).csv')
 
-# Set tema visualisasi agar terlihat profesional untuk BI
+# ==============================================================================
+# PERBAIKAN UTAMA: Mengatur Tema Dasar & Memaksa Latar Belakang Berwarna Putih
+# ==============================================================================
 sns.set_theme(style="whitegrid")
-plt.rcParams['figure.figsize'] = (12, 6)
+plt.rcParams['figure.facecolor'] = 'white'
+plt.rcParams['axes.facecolor'] = 'white'
+plt.rcParams['savefig.facecolor'] = 'white'
+
+# Menghitung selisih IPK (Post - Pre) untuk analisis dampak akademik
+df['GPA_Delta'] = df['Post_Semester_GPA'] - df['Pre_Semester_GPA']
+
 
 # ==============================================================================
 # VISUALISASI 1: Dampak Durasi Penggunaan GenAI terhadap Perubahan IPK & Retensi
 # ==============================================================================
-# Menghitung selisih IPK (Post - Pre) untuk melihat pertumbuhan/penurunan
-df['GPA_Delta'] = df['Post_Semester_GPA'] - df['Pre_Semester_GPA']
-
-fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+# Menambahkan facecolor='white' pada subplots
+fig, axes = plt.subplots(1, 2, figsize=(16, 6), facecolor='white')
 
 # Plot A: Jam GenAI vs Perubahan IPK
 sns.scatterplot(data=df, x='Weekly_GenAI_Hours', y='GPA_Delta', alpha=0.5, ax=axes[0], color='#1f77b4')
@@ -37,9 +43,9 @@ plt.show()
 
 
 # ==============================================================================
-# VISUALISASI 2: Tingkat Kecemasan Ujian & Ketergantungan AI berdasarkan Kebijakan Kampus
+# VISUALISASI 2: Tingkat Kecemasan Ujian Berdasarkan Kebijakan Kampus
 # ==============================================================================
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(12, 6), facecolor='white')
 
 # Boxplot untuk melihat distribusi kecemasan berdasarkan regulasi institusi
 sns.boxplot(data=df, x='Institutional_Policy', y='Anxiety_Level_During_Exams', hue='Institutional_Policy', palette='Set2', legend=False)
@@ -51,11 +57,11 @@ plt.show()
 
 
 # ==============================================================================
-# VISUALISASI 3: Risiko Burnout Berdasarkan Jam Penggunaan GenAI Waktu Mingguan
+# VISUALISASI 3: Risiko Burnout Berdasarkan Jam Penggunaan GenAI Mingguan
 # ==============================================================================
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(10, 6), facecolor='white')
 
-# Mengurutkan kategori burnout agar rapi di visualisasi
+# Mengurutkan kategori burnout agar rapi
 burnout_order = ['Low', 'Medium', 'High']
 
 sns.barplot(data=df, x='Burnout_Risk_Level', y='Weekly_GenAI_Hours', order=burnout_order, palette='OrRd', errorbar=None, hue='Burnout_Risk_Level', legend=False)
@@ -66,18 +72,18 @@ plt.show()
 
 
 # ==============================================================================
-# VISUALISASI 4: Matriks Korelasi Fitur Utama (Insight Cepat untuk Manajemen)
+# VISUALISASI 4: Matriks Korelasi Fitur Utama (Insight untuk Manajemen)
 # ==============================================================================
-plt.figure(figsize=(10, 8))
+plt.figure(figsize=(10, 8), facecolor='white')
 
-# Memilih kolom numerik krusial untuk melihat korelasi linear
-numerical_cols = ['Weekly_GenAI_Hours', 'Pre_Semester_GPA', 'Post_Semester_GPA',
-                  'Traditional_Study_Hours', 'Perceived_AI_Dependency',
+# Memilih kolom numerik krusial untuk melihat hubungan linear
+numerical_cols = ['Weekly_GenAI_Hours', 'Pre_Semester_GPA', 'Post_Semester_GPA', 
+                  'Traditional_Study_Hours', 'Perceived_AI_Dependency', 
                   'Anxiety_Level_During_Exams', 'Skill_Retention_Score']
 
 corr_matrix = df[numerical_cols].corr()
 
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+sns.heatmap(corr_matrix, annot=True, cmap='Coolwarm', fmt=".2f", linewidths=0.5)
 plt.title('Matriks Korelasi: Performa Akademik vs Kesejahteraan vs Penggunaan AI', fontsize=14, fontweight='bold')
 plt.tight_layout()
 plt.show()
