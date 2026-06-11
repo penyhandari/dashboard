@@ -82,7 +82,7 @@ numerical_cols = ['Weekly_GenAI_Hours', 'Pre_Semester_GPA', 'Post_Semester_GPA',
 
 corr_matrix = df[numerical_cols].corr()
 
-sns.heatmap(corr_matrix, annot=True, cmap='Coolwarm', fmt=".2f", linewidths=0.5)
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
 plt.title('Matriks Korelasi: Performa Akademik vs Kesejahteraan vs Penggunaan AI', fontsize=14, fontweight='bold')
 plt.tight_layout()
 plt.show()
