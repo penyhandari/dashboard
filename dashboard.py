@@ -96,30 +96,53 @@ with tab1:
 
     st.markdown("---")
     st.subheader("Tren Nilai ISPU dari Waktu ke Waktu")
-    
+
     # Kontrol Granularitas Waktu khusus untuk Grafik Garis
-    granularity = st.radio("Pilih Struktur Waktu Grafik:", ["Harian", "Bulanan", "Tahunan"], horizontal=True)
-    
+    granularity = st.radio("Pilih Struktur Waktu Grafik:", ["Harian", "Siklus Bulanan Kumulatif", "Tahunan"], horizontal=True)
+
     if granularity == "Harian":
         df_trend = df_filtered.groupby('tanggal')['max'].mean().reset_index()
         x_col = 'tanggal'
-    elif granularity == "Bulanan":
-        df_filtered['thn_bln'] = df_filtered['tanggal'].dt.to_period('M').astype(str)
-        df_trend = df_filtered.groupby('thn_bln')['max'].mean().reset_index()
-        x_col = 'thn_bln'
+        fig_trend = px.line(df_trend, x=x_col, y='max', 
+                            title=f"Tren Nilai Maksimal ISPU ({granularity})",
+                            labels={'max': 'Rata-rata Nilai ISPU', x_col: 'Waktu'},
+                            color_discrete_sequence=['#2c3e50'])
+
+    elif granularity == "Siklus Bulanan Kumulatif":
+        # 1. Kelompokkan berdasarkan nomor dan nama bulan agar siklus tahunan bersatu
+        df_trend = df_filtered.groupby(['bulan_num', 'nama_bulan'])['max'].mean().reset_index()
+        df_trend = df_trend.sort_values('bulan_num')
+        x_col = 'nama_bulan'
+    
+        # 2. Buat line chart dengan markers=True agar muncul titik lingkaran di setiap bulan
+        fig_trend = px.line(df_trend, x=x_col, y='max', markers=True,
+                            title="Trend Rata-rata Nilai Maksimum ISPU Kumulatif per Bulan",
+                            labels={'max': 'Rata-rata Nilai Maksimum ISPU', x_col: 'Bulan'},
+                            color_discrete_sequence=['#1f77b4']) # Warna biru standar sesuai gambar Anda
+    
+        # 3. Kunci urutan sumbu X agar Plotly patuh dari Januari ke Desember
+        fig_trend.update_layout(xaxis={'categoryorder': 'array', 'categoryarray': df_trend['nama_bulan']})
+
     else:
         df_trend = df_filtered.groupby('tahun')['max'].mean().reset_index()
         x_col = 'tahun'
-        
-    fig_trend = px.line(df_trend, x=x_col, y='max', title=f"Tren Nilai Maksimal ISPU ({granularity})",
-                        labels={'max': 'Rata-rata Nilai ISPU', x_col: 'Waktu'},
-                        color_discrete_sequence=['#2c3e50'])
-    
-    # Menambahkan garis ambang batas baku mutu (ISPU = 100 adalah batas Sehat/Tidak Sehat)
-    fig_trend.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Batas Ambang Tidak Sehat (100)", annotation_position="top left")
-    fig_trend.update_layout(hovermode="x unified")
-    st.plotly_chart(fig_trend, use_container_width=True)
+        fig_trend = px.line(df_trend, x=x_col, y='max', 
+                            title=f"Tren Nilai Maksimal ISPU ({granularity})",
+                            labels={'max': 'Rata-rata Nilai ISPU', x_col: 'Waktu'},
+                            color_discrete_sequence=['#2c3e50'])
+        fig_trend.update_xaxes(type='category')
 
+    # Menambahkan garis ambang batas baku mutu (ISPU = 100 adalah batas Sehat/Tidak Sehat)
+    fig_trend.add_hline(y=100, line_dash="dash", line_color="red", 
+                        annotation_text="Batas Ambang Tidak Sehat (100)", annotation_position="top left")
+
+    # Mengaktifkan grid line agar persis seperti gambar yang diunggah
+    fig_trend.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+    fig_trend.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+
+    fig_trend.update_layout(hovermode="x unified", plot_bgcolor='white') # Background putih bersih mirip gambar
+
+    st.plotly_chart(fig_trend, use_container_width=True)
 
 # ==============================================================================
 # TAB 2: POLA MUSIMAN & PARAMETER CRITICAL
@@ -161,7 +184,7 @@ with tab2:
                           color_discrete_map=ispu_colors)
         
         # Tambahkan baris ini untuk mengunci rentang sumbu Y dari 0 sampai 1000
-        fig_crit.update_yaxes(range=[0, 1000])
+        fig_crit.update_yaxes(range=[0, 150])
         
         st.plotly_chart(fig_crit, use_container_width=True)
 
