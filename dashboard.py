@@ -130,15 +130,22 @@ with tab2:
     with col_left:
         st.subheader("🗓️ Pola Kualitas Udara Bulanan (Siklus Musiman)")
         st.markdown("*Membantu mendeteksi bulan-bulan kritis polusi tahunan (misal: Musim Kemarau).*")
-        
-        # Mengurutkan bulan dengan benar
-        df_filtered = df_filtered.sort_values('bulan_num')
-        df_season = df_filtered.groupby('nama_bulan')['max'].mean().reset_index()
-        
+    
+        # 1. Groupby menyertakan 'bulan_num' agar angkanya tidak hilang
+        df_season = df_filtered.groupby(['bulan_num', 'nama_bulan'])['max'].mean().reset_index()
+    
+        # 2. Urutkan hasil groupby berdasarkan angka bulannya
+        df_season = df_season.sort_values('bulan_num')
+    
+        # 3. Buat grafik menggunakan data yang sudah urut
         fig_season = px.bar(df_season, x='nama_bulan', y='max', 
                             title="Rata-rata Nilai ISPU per Bulan",
                             labels={'max': 'Rata-rata ISPU', 'nama_bulan': 'Bulan'},
                             color='max', color_continuous_scale=px.colors.sequential.YlOrRd)
+    
+        # 4. Opsional: Paksa Plotly untuk mengikuti urutan DataFrame (tidak diurutkan abjad lagi oleh Plotly)
+        fig_season.update_layout(xaxis={'categoryorder': 'array', 'categoryarray': df_season['nama_bulan']})
+    
         st.plotly_chart(fig_season, use_container_width=True)
         
     with col_right:
