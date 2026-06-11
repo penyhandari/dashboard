@@ -100,7 +100,7 @@ with tab1:
     # 1. Tambahkan opsi baru di st.radio
     granularity = st.radio(
         "Pilih Struktur Waktu Grafik:", 
-        ["Harian", "Siklus Harian Kumulatif", "Siklus Bulanan Kumulatif", "Tahunan"], 
+        ["Harian", "Harian Kumulatif", "Bulanan Kumulatif", "Tahunan"], 
         horizontal=True
     )
 
@@ -126,7 +126,7 @@ with tab1:
         fig_trend = px.line(df_trend, x=x_col, y='max', markers=True,
                             title="Trend Rata-rata Nilai Maksimum ISPU Kumulatif per Hari dalam Seminggu",
                             labels={'max': 'Rata-rata Nilai Maksimum ISPU', x_col: 'Hari dalam Seminggu'},
-                            color_discrete_sequence=['#1f77b4'])
+                            color_discrete_sequence=['#2c3e50'])
     
         # 5. Kunci urutan sumbu X agar dari Monday ke Sunday
         fig_trend.update_layout(xaxis={'categoryorder': 'array', 'categoryarray': df_trend['nama_hari']})
@@ -139,7 +139,7 @@ with tab1:
         fig_trend = px.line(df_trend, x=x_col, y='max', markers=True,
                             title="Trend Rata-rata Nilai Maksimum ISPU Kumulatif per Bulan",
                             labels={'max': 'Rata-rata Nilai Maksimum ISPU', x_col: 'Bulan'},
-                            color_discrete_sequence=['#1f77b4'])
+                            color_discrete_sequence=['#2c3e50'])
     
         fig_trend.update_layout(xaxis={'categoryorder': 'array', 'categoryarray': df_trend['nama_bulan']})
 
