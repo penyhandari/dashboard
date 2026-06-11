@@ -87,7 +87,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     # Menggunakan dataset cleaned yang diunggah pengguna
-    df = pd.read_xlsx("ai_student_impact_cleaned.xlsx")
+    df = pd.read_excel("ai_student_impact_cleaned.xlsx")
     
     # Memastikan format kolom kategori bersih
     category_cols = ['Major_Category', 'Year_of_Study', 'Institutional_Policy', 'Burnout_Risk_Level', 'Primary_Use_Case']
