@@ -53,7 +53,7 @@ ispu_colors = {
     'SEDANG': '#3498db',          # Biru
     'TIDAK SEHAT': '#f1c40f',     # Kuning
     'SANGAT TIDAK SEHAT': '#e74c3c', # Merah
-    'BERBAHAYA': '#2c3e50'        # Hitam/Gelap
+    'BERBAHAYA': '#708090'        # Hitam/Gelap
 }
 
 # --- HEADER UTAMA ---
