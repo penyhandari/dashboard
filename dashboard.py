@@ -85,9 +85,10 @@ with st.sidebar:
     st.image("https://img.icons8.com/external-flatart-icons-lineal-color-flatart-icons/64/000000/external-ecology-environmentalism-flatart-icons-lineal-color-flatart-icons.png", width=50)
     st.title("Kontrol Analisis")
     st.markdown("---")
-    
+
     # Filter 1: Dropdown Pilih Stasiun SPKU (Menggunakan istilah kedinasan)
-    list_stasiun = sorted(list(df_orig['stasiun'].unique()))
+    # Buang nilai NaN sebelum mengambil nilai unik dan mengurutkannya
+    list_stasiun = sorted(list(df_orig['stasiun'].dropna().unique()))
     opsi_stasiun = ["Semua Stasiun"] + list_stasiun
     selected_stasiun = st.selectbox("Pilih Stasiun SPKU:", opsi_stasiun, index=0)
     
