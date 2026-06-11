@@ -1,11 +1,6 @@
-import streamlit as st
 import pandas as pd
-import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
-import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime
+import seaborn as sns
 
 # 1. Load Dataset
 # Sesuaikan path file jika dijalankan di lingkungan lokal Anda
@@ -76,8 +71,8 @@ plt.show()
 plt.figure(figsize=(10, 8))
 
 # Memilih kolom numerik krusial untuk melihat korelasi linear
-numerical_cols = ['Weekly_GenAI_Hours', 'Pre_Semester_GPA', 'Post_Semester_GPA', 
-                  'Traditional_Study_Hours', 'Perceived_AI_Dependency', 
+numerical_cols = ['Weekly_GenAI_Hours', 'Pre_Semester_GPA', 'Post_Semester_GPA',
+                  'Traditional_Study_Hours', 'Perceived_AI_Dependency',
                   'Anxiety_Level_During_Exams', 'Skill_Retention_Score']
 
 corr_matrix = df[numerical_cols].corr()
