@@ -190,7 +190,7 @@ with tab2:
     
         st.plotly_chart(fig_season, use_container_width=True)
         
-    with col_right:
+        with col_right:
             st.subheader("🧪 Distribusi Parameter Kritis per Tahun")
             st.markdown("*Persentase parameter polutan yang bertanggung jawab memicu pemburukan kualitas udara setiap tahunnya.*")
         
