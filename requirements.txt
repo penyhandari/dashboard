@@ -7,3 +7,5 @@ seaborn
 matplotlib
 folium
 streamlit_folium
+dash
+Dash
