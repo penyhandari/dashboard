@@ -141,13 +141,17 @@ dominant_pollutant = df_filtered['critical'].mode().values[0] if not df_filtered
 # Menghitung persentase hari tidak sehat
 kategori_buruk = ['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA']
 
-# 2. Hitung total semua hari unik yang ada di dalam dataset
-total_days = df_filtered['tanggal'].nunique()
+# 2. Hitung jumlah tahun unik yang ada setelah data difilter
+#    Misal: jika filter menghasilkan tahun 2019, 2020, 2021, 2022, 2023 -> jumlahnya 5 tahun
+jumlah_tahun = df_filtered['year'].nunique()
 
-# 3. Filter data untuk mencari tanggal yang memiliki kategori buruk, lalu ambil jumlah tanggal uniknya
+# 3. Total days adalah jumlah tahun dikalikan 365 hari
+total_days = jumlah_tahun * 365
+
+# 4. Hitung jumlah hari buruk unik (satu tanggal hanya dihitung maksimal 1 kali)
 unhealthy_days = df_filtered[df_filtered['categori'].isin(kategori_buruk)]['tanggal'].nunique()
 
-# 4. Hitung persentase
+# 5. Hitung persentase terhadap total hari kalender
 unhealthy_pct = round((unhealthy_days / total_days) * 100, 1) if total_days > 0 else 0
 
 # Penentuan warna kelas alert untuk Max AQI harian
