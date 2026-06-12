@@ -7,4 +7,3 @@ seaborn
 matplotlib
 folium
 streamlit_folium
-os
