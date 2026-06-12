@@ -199,7 +199,9 @@ with vis_col1:
     )
     
     # Tambahkan garis ambang batas Kategori Sehat/Sedang (AQI 100)
-    fig_spku.add_vline(x=100, line_dash="dash", line_color="#ef4444", annotation_text="Batas Aman (100)", annotation_position="top right")
+    fig_trend.add_hline(y=100, line_dash="dash", line_color="red", annotation_text="Batas Ambang Tidak Sehat (100)", annotation_position="top left")
+    fig_trend.update_layout(hovermode="x unified")
+    st.plotly_chart(fig_trend, use_container_width=True)
     
     fig_spku.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
