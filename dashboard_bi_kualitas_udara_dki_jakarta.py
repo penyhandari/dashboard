@@ -56,7 +56,7 @@ st.markdown("""
 # -----------------------------------------------------------------------------
 @st.cache_data
 def load_data():
-    file_path = "df_clean.csv"
+    file_path = "df_clean2.csv"
     if not os.path.exists(file_path):
         # Fallback dummy data jika dijalankan tanpa file df_clean.csv secara lokal
         st.error(f"File '{file_path}' tidak ditemukan di direktori saat ini. Silakan letakkan file tersebut bersama dengan file script ini.")
