@@ -424,44 +424,6 @@ with action_col2:
     )
     st.caption("Menampilkan hingga 100 baris data teratas yang diurutkan dari indeks polusi tertinggi.")
 
-#---------------------------------
-    st.subheader("📊 Analisis Tahunan: Persentase Hari Tidak Sehat")
-
-# 1. Menghitung total hari tercatat per tahun
-    df_total_per_tahun = df_filtered.groupby('year').size().reset_index(name='total_hari')
-
-# 2. Menghitung jumlah hari dengan kategori buruk per tahun (Tidak Sehat, Sangat Tidak Sehat, Berbahaya)
-    df_hari_buruk = df_filtered[
-        df_filtered['categori'].isin(['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA'])
-    ].groupby('year').size().reset_index(name='hari_buruk')
-
-# 3. Menggabungkan data dan menghitung persentase spesifik tiap tahun
-    df_persentase_tahunan = pd.merge(df_total_per_tahun, df_hari_buruk, on='year', how='left').fillna(0)
-    df_persentase_tahunan['Persentase (%)'] = round((df_persentase_tahunan['hari_buruk'] / df_persentase_tahunan['total_hari']) * 100, 1)
-
-# 4. Membuat Visualisasi Bar Chart
-    fig_bar_tahunan = px.bar(
-        df_persentase_tahunan,
-        x='year',
-        y='Persentase (%)',
-        text_auto='.1f', # Menampilkan label angka persentase langsung di atas batang grafik
-        labels={'year': 'Tahun Analisis', 'Persentase (%)': 'Persentase Hari Tidak Sehat (%)'},
-        color='Persentase (%)',
-        color_continuous_scale=px.colors.sequential.OrRd # Gradasi warna merah jingga premium
-    )
-
-# 5. Kustomisasi Layout agar Senada dengan Tema Gelap Dashboard
-    fig_bar_tahunan.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#f1f5f9',
-        xaxis=dict(type='category', showgrid=False), # Memastikan tahun dibaca sebagai kategori tunggal (bukan angka kontinu)
-        yaxis=dict(showgrid=True, gridcolor='#334155', title="Persentase (%)"),
-        coloraxis_showscale=False, # Menyembunyikan colorbar di sebelah kanan agar grafik lebih bersih
-        height=350,
-        margin=dict(l=10, r=10, t=20, b=10)
-)
-
 # Render Grafik ke Streamlit
 st.plotly_chart(fig_bar_tahunan, use_container_width=True)
 
