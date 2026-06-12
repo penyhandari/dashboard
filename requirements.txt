@@ -6,3 +6,4 @@ openpyxl
 seaborn
 matplotlib
 folium
+st_folium
