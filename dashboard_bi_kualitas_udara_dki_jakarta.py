@@ -58,6 +58,7 @@ st.markdown("""
 def load_data():
     file_path = "df_clean2.csv"
     if not os.path.exists(file_path):
+        # Fallback dummy data jika dijalankan tanpa file df_clean.csv secara lokal
         st.error(f"File '{file_path}' tidak ditemukan di direktori saat ini. Silakan letakkan file tersebut bersama dengan file script ini.")
         st.stop()
         
@@ -66,13 +67,6 @@ def load_data():
     df['year'] = df['year'].astype(int)
     # Bersihkan nama kategori agar seragam (Kapital)
     df['categori'] = df['categori'].str.upper().str.strip()
-    
-    # Tambahan Ekstraksi Fitur Waktu untuk Analisis Tren Granular
-    df['bulan_nama'] = df['tanggal'].dt.strftime('%B')
-    df['bulan_num'] = df['tanggal'].dt.month
-    df['hari_nama'] = df['tanggal'].dt.strftime('%A')
-    df['hari_num'] = df['tanggal'].dt.weekday # 0=Senin, 6=Minggu
-    
     return df
 
 try:
@@ -189,8 +183,10 @@ vis_col1, vis_col2 = st.columns([6, 4])
 
 with vis_col1:
     st.subheader("📍 Peringkat Polusi dan Kondisi SPKU di Jakarta")
+    # Urutkan SPKU berdasarkan rata-rata nilai max polutan
     df_spku = df_filtered.groupby('stasiun')['max'].mean().reset_index().sort_values('max', ascending=True)
     
+    # Skema Warna Kontras Tinggi untuk Kebutuhan Presentasi
     fig_spku = px.bar(
         df_spku,
         x='max',
@@ -202,6 +198,7 @@ with vis_col1:
         text_auto='.1f'
     )
     
+    # Tambahkan garis ambang batas Kategori Sehat/Sedang (AQI 100)
     fig_spku.add_vline(x=100, line_dash="dash", line_color="#ef4444", annotation_text="Batas Aman (100)", annotation_position="top right")
     
     fig_spku.update_layout(
@@ -215,6 +212,7 @@ with vis_col1:
 
 with vis_col2:
     st.subheader("🎯 Komposisi Penyebab Polusi (Critical)")
+    # Hitung kontribusi masing-masing parameter kritis
     df_crit_comp = df_filtered['critical'].value_counts().reset_index()
     df_crit_comp.columns = ['Parameter', 'Jumlah Kasus']
     
@@ -237,37 +235,29 @@ with vis_col2:
 
 st.markdown("---")
 
-# -----------------------------------------------------------------------------
-# [BARU] REVISI BARIS 3: TREN TEMPORAL DENGAN AMBANG BATAS 100
-# -----------------------------------------------------------------------------
+# BARIS 3: TREN TEMPORAL (LINE CHART)
 st.subheader("📈 Tren Perkembangan Polusi Udara Harian & Bulanan")
+# Kelompokkan data harian untuk line chart yang mulus
 df_trend = df_filtered.groupby('tanggal')['max'].mean().reset_index()
+
+# Tambahkan Moving Average (Rata-rata Bergerak 7 Hari) untuk meminimalkan 'noise' data harian
 df_trend['7-Day MA'] = df_trend['max'].rolling(window=7, min_periods=1).mean()
 
 fig_trend = go.Figure()
+# Line Harian (Transparan/Tipis)
 fig_trend.add_trace(go.Scatter(
     x=df_trend['tanggal'], y=df_trend['max'],
     mode='lines',
     name='Harian',
     line=dict(color='#64748b', width=1)
 ))
+# Line Moving Average (Tebal & Kontras Tinggi)
 fig_trend.add_trace(go.Scatter(
     x=df_trend['tanggal'], y=df_trend['7-Day MA'],
     mode='lines',
     name='Rata-Rata Bergerak 7 Hari',
     line=dict(color='#f43f5e', width=3)
 ))
-
-# MENAMBAHKAN GARIS AMBANG BATAS HORIZONTAL PUTUS-PUTUS MERAH (AQI = 100)
-fig_trend.add_hline(
-    y=100, 
-    line_dash="dash", 
-    line_color="#ef4444", 
-    line_width=2,
-    annotation_text="Ambang Batas Aman (100)", 
-    annotation_position="top left",
-    annotation_font=dict(color="#ef4444")
-)
 
 fig_trend.update_layout(
     paper_bgcolor='rgba(0,0,0,0)',
@@ -284,103 +274,14 @@ st.plotly_chart(fig_trend, use_container_width=True)
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
-# [BARU] BARIS 4: VISUALISASI PERSENTASE HARI TIDAK SEHAT & TREN GRANULAR
-# -----------------------------------------------------------------------------
-st.subheader("📊 Analisis Komparatif Tahunan & Pola Distribusi Polusi")
-annual_col, granular_col = st.columns([4, 6])
-
-with annual_col:
-    st.markdown("**1. Kategori Hari Tidak Sehat & Sangat Tidak Sehat Per Tahun**")
-    
-    # Hitung total hari vs hari buruk per tahun
-    df_annual_total = df_filtered.groupby('year').size().reset_index(name='total_hari')
-    df_annual_bad = df_filtered[df_filtered['categori'].isin(['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA'])].groupby('year').size().reset_index(name='hari_buruk')
-    
-    df_pct_annual = pd.merge(df_annual_total, df_annual_bad, on='year', how='left').fillna(0)
-    df_pct_annual['Persentase (%)'] = round((df_pct_annual['hari_buruk'] / df_pct_annual['total_hari']) * 100, 1)
-    
-    fig_annual_pct = px.bar(
-        df_pct_annual,
-        x='year',
-        y='Persentase (%)',
-        text_auto='.1f',
-        labels={'year': 'Tahun', 'Persentase (%)': 'Persentase Hari (%)'},
-        color='Persentase (%)',
-        color_continuous_scale=px.colors.sequential.OrRd
-    )
-    fig_annual_pct.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#f1f5f9',
-        height=320,
-        coloraxis_showscale=False,
-        margin=dict(l=10, r=10, t=10, b=10)
-    )
-    st.plotly_chart(fig_annual_pct, use_container_width=True)
-
-with granular_col:
-    st.markdown("**2. Pola Distribusi Kepadatan Polusi (Granularitas Bulanan & Mingguan/Harian)**")
-    
-    gran_sub_col1, gran_sub_col2 = st.columns(2)
-    
-    with gran_sub_col1:
-        # Analisis Bulanan
-        df_month_analysis = df_filtered.groupby(['bulan_num', 'bulan_nama'])['max'].mean().reset_index().sort_values('bulan_num')
-        
-        fig_month = px.bar(
-            df_month_analysis,
-            x='bulan_nama',
-            y='max',
-            labels={'bulan_nama': 'Bulan', 'max': 'Rata-Rata AQI'},
-            title='Rata-Rata Polusi Per Bulan',
-            color='max',
-            color_continuous_scale=px.colors.sequential.YlOrRd
-        )
-        fig_month.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font_color='#f1f5f9',
-            height=280,
-            coloraxis_showscale=False,
-            margin=dict(l=10, r=10, t=40, b=10)
-        )
-        st.plotly_chart(fig_month, use_container_width=True)
-        
-    with gran_sub_col2:
-        # Analisis Mingguan (Berdasarkan Hari dalam seminggu untuk menangkap tren pola komuter)
-        df_day_analysis = df_filtered.groupby(['hari_num', 'hari_nama'])['max'].mean().reset_index().sort_values('hari_num')
-        # Map nama hari ke bahasa Indonesia agar lebih representatif untuk DLH
-        hari_indo = {'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu', 'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'}
-        df_day_analysis['hari_nama'] = df_day_analysis['hari_nama'].map(hari_indo)
-        
-        fig_day = px.bar(
-            df_day_analysis,
-            x='hari_nama',
-            y='max',
-            labels={'hari_nama': 'Hari', 'max': 'Rata-Rata AQI'},
-            title='Rata-Rata Polusi Per Hari',
-            color='max',
-            color_continuous_scale=px.colors.sequential.YlOrRd
-        )
-        fig_day.update_layout(
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            font_color='#f1f5f9',
-            height=280,
-            coloraxis_showscale=False,
-            margin=dict(l=10, r=10, t=40, b=10)
-        )
-        st.plotly_chart(fig_day, use_container_width=True)
-
-st.markdown("---")
-
-# -----------------------------------------------------------------------------
 # 5. REKOMENDASI TAKTIS & DETAIL DATA (BARIS BAWAH)
 # -----------------------------------------------------------------------------
 action_col1, action_col2 = st.columns([5, 5])
 
 with action_col1:
     st.subheader("📋 Rekomendasi Kebijakan Taktis (Data-Driven)")
+    
+    # Algoritma Kecerdasan Sederhana berbasis Parameter Kritis Terbanyak
     dominant_clean = str(dominant_pollutant).strip().upper()
     
     st.markdown('<div class="rec-box">', unsafe_allow_html=True)
@@ -416,6 +317,7 @@ with action_col2:
     st.subheader("🔍 Sampel Data Historis Terdampak")
     st.markdown("Berikut adalah tabel data yang sesuai dengan filter Anda untuk validasi silang:")
     
+    # Menampilkan tabel data ringkas yang mudah diexport ke Excel/CSV
     df_table_show = df_filtered[['tanggal', 'stasiun', 'max', 'critical', 'categori']].sort_values('max', ascending=False)
     st.dataframe(
         df_table_show.head(100), 
