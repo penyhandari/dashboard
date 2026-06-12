@@ -425,7 +425,7 @@ with action_col2:
     st.caption("Menampilkan hingga 100 baris data teratas yang diurutkan dari indeks polusi tertinggi.")
 
 # Render Grafik ke Streamlit
-st.plotly_chart(fig_bar_tahunan, use_container_width=True)
+#st.plotly_chart(fig_bar_tahunan, use_container_width=True)
 
 # Footer Dashboard
 st.markdown("---")
