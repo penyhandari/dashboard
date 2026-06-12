@@ -5,5 +5,5 @@ numpy
 openpyxl
 seaborn
 matplotlib
-streamlit_folium
 folium
+streamlit_folium
