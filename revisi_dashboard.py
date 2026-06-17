@@ -135,7 +135,7 @@ st.markdown("Dokumentasi Analisis Strategis untuk **Kepala Dinas Lingkungan Hidu
 st.markdown("---")
 
 # Mengolah metrik utama
-max_aqi_value = int(df_filtered['mean'].mean())
+max_aqi_value = int(df_filtered['max'].mean())
 dominant_pollutant = df_filtered['critical'].mode().values[0] if not df_filtered['critical'].empty else "N/A"
 
 # Menghitung persentase hari tidak sehat
