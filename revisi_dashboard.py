@@ -135,7 +135,7 @@ st.markdown("Dokumentasi Analisis Strategis untuk **Kepala Dinas Lingkungan Hidu
 st.markdown("---")
 
 # Mengolah metrik utama
-max_aqi_value = int(df_filtered['max'].max())
+max_aqi_value = int(df_filtered['mean'].mean())
 dominant_pollutant = df_filtered['critical'].mode().values[0] if not df_filtered['critical'].empty else "N/A"
 
 # Menghitung persentase hari tidak sehat
@@ -170,7 +170,7 @@ kpi_col1, kpi_col2, kpi_col3 = st.columns(3)
 with kpi_col1:
     st.markdown(f"""
     <div class="kpi-card {alert_class}">
-        <div class="kpi-title">INDERS AQI MAKSIMUM (MAX)</div>
+        <div class="kpi-title">RATA-RATA INDEKS UDARA</div>
         <div class="kpi-value">{max_aqi_value} <span style="font-size:16px; font-weight:normal;">({status_text})</span></div>
     </div>
     """, unsafe_allow_html=True)
