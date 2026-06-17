@@ -369,15 +369,15 @@ with granular_col:
             plot_bgcolor='rgba(0,0,0,0)',
             font_color='#f1f5f9',
             height=280,
-            coloraxis_showscale=False,
+            coloraxis_showscale=True, # <-- DIUBAH JADI TRUE UNTUK MUNCULKAN LEGEND
+            coloraxis_colorbar=dict(title="AQI", thickness=15, len=0.7), # Opsional: Mengatur ukuran legend agar rapi
             margin=dict(l=10, r=10, t=40, b=10)
         )
         st.plotly_chart(fig_month, use_container_width=True)
         
     with gran_sub_col2:
-        # Analisis Mingguan (Berdasarkan Hari dalam seminggu untuk menangkap tren pola komuter)
+        # Analisis Mingguan
         df_day_analysis = df_filtered.groupby(['hari_num', 'hari_nama'])['max'].mean().reset_index().sort_values('hari_num')
-        # Map nama hari ke bahasa Indonesia agar lebih representatif untuk DLH
         hari_indo = {'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu', 'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'}
         df_day_analysis['hari_nama'] = df_day_analysis['hari_nama'].map(hari_indo)
         
@@ -395,11 +395,11 @@ with granular_col:
             plot_bgcolor='rgba(0,0,0,0)',
             font_color='#f1f5f9',
             height=280,
-            coloraxis_showscale=False,
+            coloraxis_showscale=True, # <-- DIUBAH JADI TRUE UNTUK MUNCULKAN LEGEND
+            coloraxis_colorbar=dict(title="AQI", thickness=15, len=0.7), # Opsional: Mengatur ukuran legend agar rapi
             margin=dict(l=10, r=10, t=40, b=10)
         )
         st.plotly_chart(fig_day, use_container_width=True)
-
 st.markdown("---")
 
 # -----------------------------------------------------------------------------
