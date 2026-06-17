@@ -355,65 +355,48 @@ with granular_col:
         # Analisis Bulanan
         df_month_analysis = df_filtered.groupby(['bulan_num', 'bulan_nama'])['max'].mean().reset_index().sort_values('bulan_num')
         
-        # Tambahkan kolom statis untuk label legend
-        df_month_analysis['Tren'] = 'Rata-Rata AQI Bulanan'
-        
-        fig_month = px.line(
+        fig_month = px.bar(
             df_month_analysis,
             x='bulan_nama',
             y='max',
-            color='Tren',  # Memicu munculnya legend
-            color_discrete_map={'Rata-Rata AQI Bulanan': '#f97316'}, # Set warna garis
             labels={'bulan_nama': 'Bulan', 'max': 'Rata-Rata AQI'},
-            title='Tren Rata-Rata Polusi Per Bulan',
-            markers=True
+            title='Rata-Rata Polusi Per Bulan',
+            color='max',
+            color_continuous_scale=px.colors.sequential.YlOrRd
         )
-        
-        fig_month.update_traces(line_width=3, marker=dict(size=8))
         fig_month.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font_color='#f1f5f9',
             height=280,
-            margin=dict(l=10, r=10, t=40, b=10),
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)'),
-            showlegend=True, # Memaksa legend agar tetap tampil
-            legend=dict(orient="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Posisi legend di atas grafik
+            coloraxis_showscale=False,
+            margin=dict(l=10, r=10, t=40, b=10)
         )
         st.plotly_chart(fig_month, use_container_width=True)
         
     with gran_sub_col2:
-        # Analisis Mingguan
+        # Analisis Mingguan (Berdasarkan Hari dalam seminggu untuk menangkap tren pola komuter)
         df_day_analysis = df_filtered.groupby(['hari_num', 'hari_nama'])['max'].mean().reset_index().sort_values('hari_num')
+        # Map nama hari ke bahasa Indonesia agar lebih representatif untuk DLH
         hari_indo = {'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu', 'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'}
         df_day_analysis['hari_nama'] = df_day_analysis['hari_nama'].map(hari_indo)
         
-        # Tambahkan kolom statis untuk label legend
-        df_day_analysis['Tren'] = 'Rata-Rata AQI Harian'
-        
-        fig_day = px.line(
+        fig_day = px.bar(
             df_day_analysis,
             x='hari_nama',
             y='max',
-            color='Tren',  # Memicu munculnya legend
-            color_discrete_map={'Rata-Rata AQI Harian': '#ef4444'}, # Set warna garis
             labels={'hari_nama': 'Hari', 'max': 'Rata-Rata AQI'},
-            title='Tren Rata-Rata Polusi Per Hari',
-            markers=True
+            title='Rata-Rata Polusi Per Hari',
+            color='max',
+            color_continuous_scale=px.colors.sequential.YlOrRd
         )
-        
-        fig_day.update_traces(line_width=3, marker=dict(size=8))
         fig_day.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font_color='#f1f5f9',
             height=280,
-            margin=dict(l=10, r=10, t=40, b=10),
-            xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)'),
-            showlegend=True, # Memaksa legend agar tetap tampil
-            legend=dict(orient="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Posisi legend di atas grafik
+            coloraxis_showscale=False,
+            margin=dict(l=10, r=10, t=40, b=10)
         )
         st.plotly_chart(fig_day, use_container_width=True)
 
