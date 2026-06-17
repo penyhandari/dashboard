@@ -301,24 +301,44 @@ st.subheader("📊 Analisis Komparatif Tahunan & Pola Distribusi Polusi")
 annual_col, granular_col = st.columns([4, 6])
 
 with annual_col:
+
     st.markdown("**1. Kategori Hari Tidak Sehat & Sangat Tidak Sehat Per Tahun**")
+
     
-    # Ganti df_filtered dengan df (DataFrame utama sebelum difilter) agar visualisasi tetap statis
-    df_annual_total = df.groupby('year').size().reset_index(name='total_hari')
-    df_annual_bad = df[df['categori'].isin(['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA'])].groupby('year').size().reset_index(name='hari_buruk')
+
+    # Hitung total hari vs hari buruk per tahun
+
+    df_annual_total = df_filtered.groupby('year').size().reset_index(name='total_hari')
+
+    df_annual_bad = df_filtered[df_filtered['categori'].isin(['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA'])].groupby('year').size().reset_index(name='hari_buruk')
+
     
+
     df_pct_annual = pd.merge(df_annual_total, df_annual_bad, on='year', how='left').fillna(0)
+
     df_pct_annual['Persentase (%)'] = round((df_pct_annual['hari_buruk'] / df_pct_annual['total_hari']) * 100, 1)
+
     
+
     fig_annual_pct = px.bar(
+
         df_pct_annual,
+
         x='year',
+
         y='Persentase (%)',
+
         text_auto='.1f',
+
         labels={'year': 'Tahun', 'Persentase (%)': 'Persentase Hari (%)'},
+
         color='Persentase (%)',
+
         color_continuous_scale=px.colors.sequential.OrRd
+
     )
+
+
     
     # Pastikan untuk menyembunyikan colorbar/legend jika ingin persis seperti di gambar
     fig_annual_pct.update_layout(coloraxis_showscale=False)
