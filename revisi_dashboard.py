@@ -355,48 +355,55 @@ with granular_col:
         # Analisis Bulanan
         df_month_analysis = df_filtered.groupby(['bulan_num', 'bulan_nama'])['max'].mean().reset_index().sort_values('bulan_num')
         
+        # Mengubah px.bar menjadi px.line dan menambah markers=True
         fig_month = px.line(
             df_month_analysis,
             x='bulan_nama',
             y='max',
             labels={'bulan_nama': 'Bulan', 'max': 'Rata-Rata AQI'},
-            title='Rata-Rata Polusi Per Bulan',
-            color='max',
-            color_continuous_scale=px.colors.sequential.YlOrRd
+            title='Tren Rata-Rata Polusi Per Bulan',
+            markers=True
         )
+        # Menyesuaikan warna garis agar senada dengan tema (misal: Oranye/Merah)
+        fig_month.update_traces(line_color='#f97316', line_width=3, marker=dict(size=8))
+        
         fig_month.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font_color='#f1f5f9',
             height=280,
-            coloraxis_showscale=False,
-            margin=dict(l=10, r=10, t=40, b=10)
+            margin=dict(l=10, r=10, t=40, b=10),
+            xaxis=dict(showgrid=False),
+            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)')
         )
         st.plotly_chart(fig_month, use_container_width=True)
         
     with gran_sub_col2:
-        # Analisis Mingguan (Berdasarkan Hari dalam seminggu untuk menangkap tren pola komuter)
+        # Analisis Mingguan
         df_day_analysis = df_filtered.groupby(['hari_num', 'hari_nama'])['max'].mean().reset_index().sort_values('hari_num')
-        # Map nama hari ke bahasa Indonesia agar lebih representatif untuk DLH
         hari_indo = {'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu', 'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'}
         df_day_analysis['hari_nama'] = df_day_analysis['hari_nama'].map(hari_indo)
         
+        # Mengubah px.bar menjadi px.line dan menambah markers=True
         fig_day = px.line(
             df_day_analysis,
             x='hari_nama',
             y='max',
             labels={'hari_nama': 'Hari', 'max': 'Rata-Rata AQI'},
-            title='Rata-Rata Polusi Per Hari',
-            color='max',
-            color_continuous_scale=px.colors.sequential.YlOrRd
+            title='Tren Rata-Rata Polusi Per Hari',
+            markers=True
         )
+        # Menyesuaikan warna garis (misal: Merah Tua/Crimson)
+        fig_day.update_traces(line_color='#ef4444', line_width=3, marker=dict(size=8))
+        
         fig_day.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             font_color='#f1f5f9',
             height=280,
-            coloraxis_showscale=False,
-            margin=dict(l=10, r=10, t=40, b=10)
+            margin=dict(l=10, r=10, t=40, b=10),
+            xaxis=dict(showgrid=False),
+            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)')
         )
         st.plotly_chart(fig_day, use_container_width=True)
 
