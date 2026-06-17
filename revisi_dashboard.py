@@ -355,18 +355,21 @@ with granular_col:
         # Analisis Bulanan
         df_month_analysis = df_filtered.groupby(['bulan_num', 'bulan_nama'])['max'].mean().reset_index().sort_values('bulan_num')
         
-        # Mengubah px.bar menjadi px.line dan menambah markers=True
+        # Tambahkan kolom statis untuk label legend
+        df_month_analysis['Tren'] = 'Rata-Rata AQI Bulanan'
+        
         fig_month = px.line(
             df_month_analysis,
             x='bulan_nama',
             y='max',
+            color='Tren',  # Memicu munculnya legend
+            color_discrete_map={'Rata-Rata AQI Bulanan': '#f97316'}, # Set warna garis
             labels={'bulan_nama': 'Bulan', 'max': 'Rata-Rata AQI'},
             title='Tren Rata-Rata Polusi Per Bulan',
             markers=True
         )
-        # Menyesuaikan warna garis agar senada dengan tema (misal: Oranye/Merah)
-        fig_month.update_traces(line_color='#f97316', line_width=3, marker=dict(size=8))
         
+        fig_month.update_traces(line_width=3, marker=dict(size=8))
         fig_month.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -374,7 +377,9 @@ with granular_col:
             height=280,
             margin=dict(l=10, r=10, t=40, b=10),
             xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)')
+            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)'),
+            showlegend=True, # Memaksa legend agar tetap tampil
+            legend=dict(orient="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Posisi legend di atas grafik
         )
         st.plotly_chart(fig_month, use_container_width=True)
         
@@ -384,18 +389,21 @@ with granular_col:
         hari_indo = {'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu', 'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'}
         df_day_analysis['hari_nama'] = df_day_analysis['hari_nama'].map(hari_indo)
         
-        # Mengubah px.bar menjadi px.line dan menambah markers=True
+        # Tambahkan kolom statis untuk label legend
+        df_day_analysis['Tren'] = 'Rata-Rata AQI Harian'
+        
         fig_day = px.line(
             df_day_analysis,
             x='hari_nama',
             y='max',
+            color='Tren',  # Memicu munculnya legend
+            color_discrete_map={'Rata-Rata AQI Harian': '#ef4444'}, # Set warna garis
             labels={'hari_nama': 'Hari', 'max': 'Rata-Rata AQI'},
             title='Tren Rata-Rata Polusi Per Hari',
             markers=True
         )
-        # Menyesuaikan warna garis (misal: Merah Tua/Crimson)
-        fig_day.update_traces(line_color='#ef4444', line_width=3, marker=dict(size=8))
         
+        fig_day.update_traces(line_width=3, marker=dict(size=8))
         fig_day.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
@@ -403,7 +411,9 @@ with granular_col:
             height=280,
             margin=dict(l=10, r=10, t=40, b=10),
             xaxis=dict(showgrid=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)')
+            yaxis=dict(showgrid=True, gridcolor='rgba(241, 245, 249, 0.1)'),
+            showlegend=True, # Memaksa legend agar tetap tampil
+            legend=dict(orient="h", yanchor="bottom", y=1.02, xanchor="right", x=1) # Posisi legend di atas grafik
         )
         st.plotly_chart(fig_day, use_container_width=True)
 
