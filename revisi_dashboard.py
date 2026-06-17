@@ -284,7 +284,13 @@ fig_trend.update_layout(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
     font_color='#f1f5f9',
-    xaxis=dict(showgrid=True, gridcolor='#334155'),
+    # PERUBAHAN PADA SUMBU X AGAR MENGIKUTI FILTER TAHUN DENGAN RAPI
+    xaxis=dict(
+        type='date',                         # Memastikan Plotly membaca format tanggal
+        autorange=True,                      # Otomatis menyesuaikan dengan min & max tanggal data terfilter
+        showgrid=True, 
+        gridcolor='#334155'
+    ),
     yaxis=dict(showgrid=True, gridcolor='#334155', title="Indeks Polutan (AQI Max)"),
     height=350,
     margin=dict(l=10, r=10, t=10, b=10),
