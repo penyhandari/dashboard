@@ -308,9 +308,9 @@ with annual_col:
 
     # Hitung total hari vs hari buruk per tahun
 
-    df_annual_total = df_filtered.groupby('year').size().reset_index(name='total_hari')
+    df_annual_total = df_raw.groupby('year').size().reset_index(name='total_hari')
 
-    df_annual_bad = df_filtered[df_filtered['categori'].isin(['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA'])].groupby('year').size().reset_index(name='hari_buruk')
+    df_annual_bad = df_raw[df_raw['categori'].isin(['TIDAK SEHAT', 'SANGAT TIDAK SEHAT', 'BERBAHAYA'])].groupby('year').size().reset_index(name='hari_buruk')
 
     
 
