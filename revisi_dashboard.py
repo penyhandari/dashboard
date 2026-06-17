@@ -355,7 +355,7 @@ with granular_col:
         # Analisis Bulanan
         df_month_analysis = df_filtered.groupby(['bulan_num', 'bulan_nama'])['max'].mean().reset_index().sort_values('bulan_num')
         
-        fig_month = px.bar(
+        fig_month = px.line(
             df_month_analysis,
             x='bulan_nama',
             y='max',
@@ -381,7 +381,7 @@ with granular_col:
         hari_indo = {'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu', 'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu', 'Sunday': 'Minggu'}
         df_day_analysis['hari_nama'] = df_day_analysis['hari_nama'].map(hari_indo)
         
-        fig_day = px.bar(
+        fig_day = px.line(
             df_day_analysis,
             x='hari_nama',
             y='max',
