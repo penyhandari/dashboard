@@ -130,7 +130,7 @@ if df_filtered.empty:
 # -----------------------------------------------------------------------------
 # 3. KEPALA DASHBOARD (HEADER & KPI CARDS)
 # -----------------------------------------------------------------------------
-st.title("📊 PEMANTAUAN & KEPUTUSAN KUALITAS UDARA DKI JAKARTA")
+st.title("📊 PEMANTAUAN KUALITAS UDARA DKI JAKARTA")
 st.markdown("Dokumentasi Analisis Strategis untuk **Kepala Dinas Lingkungan Hidup DKI Jakarta** guna merumuskan kebijakan taktis penanganan polusi udara.")
 st.markdown("---")
 
